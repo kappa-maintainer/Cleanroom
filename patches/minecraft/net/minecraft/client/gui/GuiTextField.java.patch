@@ -1,0 +1,28 @@
+--- before/net/minecraft/client/gui/GuiTextField.java
++++ after/net/minecraft/client/gui/GuiTextField.java
+@@ -9,9 +9,12 @@
+ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+ import net.minecraft.util.ChatAllowedCharacters;
+ import net.minecraft.util.math.MathHelper;
++import net.minecraftforge.client.gui.IMEWrapper;
+ import net.minecraftforge.fml.relauncher.Side;
+ import net.minecraftforge.fml.relauncher.SideOnly;
+ 
++import javax.swing.*;
++
+ @SideOnly(Side.CLIENT)
+ public class GuiTextField extends Gui
+ {
+@@ -624,6 +627,12 @@
+         if (Minecraft.func_71410_x().field_71462_r != null)
+         {
+             Minecraft.func_71410_x().field_71462_r.func_193975_a(p_146195_1_);
++        }
++        IMEWrapper.setTextField(this);
++        if (p_146195_1_ && !IMEWrapper.instance.isVisible()) {
++            IMEWrapper.instance.setVisible(true);
++        } else if(!p_146195_1_ && IMEWrapper.instance.isVisible()) {
++            IMEWrapper.instance.setVisible(false);
+         }
+     }
+ 
