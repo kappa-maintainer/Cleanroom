@@ -1,6 +1,9 @@
-package net.minecraftforge.client.gui;
+package com.cleanroommc.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.opengl.Display;
 
@@ -8,7 +11,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class IMEWrapper extends JFrame{
+@SideOnly(Side.CLIENT)
+public class IMEWrapper extends JDialog{
     public static JTextField text;
 
     public static IMEWrapper instance = new IMEWrapper();
@@ -22,13 +26,14 @@ public class IMEWrapper extends JFrame{
         this.setUndecorated(true);
         this.setType(Type.POPUP);
         this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         text = new JTextField();
         this.add(text);
         text.requestFocusInWindow();
         text.addActionListener(actionEvent -> {
             instance.setVisible(false);
-            Keyboard.addKeyEvent(257, true);
+            //Keyboard.addCharEvent(257, '\r');
+            Minecraft.getMinecraft().currentScreen.keyTyped('\r', 257);
             text.setText("");
         });
         text.getDocument().addDocumentListener(new DocumentListener() {
