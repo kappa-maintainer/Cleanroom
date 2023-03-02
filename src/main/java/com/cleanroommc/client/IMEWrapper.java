@@ -10,6 +10,7 @@ import org.lwjglx.opengl.Display;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
 public class IMEWrapper extends JDialog{
@@ -32,8 +33,11 @@ public class IMEWrapper extends JDialog{
         text.requestFocusInWindow();
         text.addActionListener(actionEvent -> {
             instance.setVisible(false);
-            //Keyboard.addCharEvent(257, '\r');
-            Minecraft.getMinecraft().currentScreen.keyTyped('\r', 257);
+            try {
+                Minecraft.getMinecraft().currentScreen.inputKeyCode(28);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             text.setText("");
         });
         text.getDocument().addDocumentListener(new DocumentListener() {
