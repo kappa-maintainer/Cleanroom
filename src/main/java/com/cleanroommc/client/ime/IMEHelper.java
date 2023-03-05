@@ -1,102 +1,19 @@
-package com.cleanroommc.client;
+package com.cleanroommc.client.ime;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjglx.input.Keyboard;
-import org.lwjglx.opengl.Display;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.im.InputContext;
-import java.io.IOException;
 
-import static java.awt.event.KeyEvent.getKeyText;
 
-@SideOnly(Side.CLIENT)
-public class IMEWrapper extends JDialog{
-    public static JTextField textField;
-
-    public static IMEWrapper instance = new IMEWrapper();
-    private static GuiTextField guiTextField = null;
-    public static synchronized void setTextField(GuiTextField fieldIn) {
-        guiTextField = fieldIn;
+public class IMEHelper {
+    public static boolean isWrapperVisible() {
+        return IMEWrapper.instance.isVisible() || IMEWrapperSign.instance.isVisible();
     }
 
-    public static synchronized void setText(String text) {
-        textField.setText(text);
-    }
-    public IMEWrapper() {
-
-        this.setVisible(false);
-        this.setUndecorated(true);
-        this.setType(Type.POPUP);
-        this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        textField = new JTextField();
-        this.add(textField);
-        textField.requestFocusInWindow();
-        textField.addActionListener(actionEvent -> {
-            instance.setVisible(false);
-            try {
-                Minecraft.getMinecraft().currentScreen.inputKeyCode(Keyboard.KEY_RETURN);
-            } catch (IOException ignored) {}
-
-            //text.setText("");
-        });
-        textField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                if (guiTextField != null) {
-                    guiTextField.setText(textField.getText());
-                    guiTextField.setCursorPosition(textField.getCaretPosition());
-                }
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                if (guiTextField != null) {
-                    guiTextField.setText(textField.getText());
-                    guiTextField.setCursorPosition(textField.getCaretPosition());
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                if (guiTextField != null) {
-                    guiTextField.setText(textField.getText());
-                    guiTextField.setCursorPosition(textField.getCaretPosition());
-                }
-            }
-        });
-        textField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) {
-                FMLLog.log.info("TYPED: " + keyEvent.getKeyCode());
-                FMLLog.log.info("TYPED: " + getKeyText(keyEvent.getKeyCode()));
-            }
-
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {
-                FMLLog.log.info("PRESSED: " + keyEvent.getKeyCode());
-                FMLLog.log.info("PRESSED: " + getKeyText(keyEvent.getKeyCode()));
-            }
-
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-                FMLLog.log.info("RELEASED: " + keyEvent.getKeyCode());
-                FMLLog.log.info("RELEASED: " + getKeyText(keyEvent.getKeyCode()));
-            }
-        });
-
-    }
-    private int translateFromAWT( int aCode ) {
+    /*
+     * Copied from https://www.jpct.net/forum2/index.php?topic=749.0
+     */
+    public static int translateFromAWT( int aCode ) {
         return switch (aCode) {
             case KeyEvent.VK_ESCAPE -> Keyboard.KEY_ESCAPE;
             case KeyEvent.VK_1 -> Keyboard.KEY_1;
@@ -210,7 +127,7 @@ public class IMEWrapper extends JDialog{
             default -> Keyboard.KEY_NONE;
         };
     }
-    private int translateToAWT( int aCode ) {
+    public static int translateToAWT( int aCode ) {
         return switch (aCode) {
             case Keyboard.KEY_ESCAPE -> KeyEvent.VK_ESCAPE;
             case Keyboard.KEY_1 -> KeyEvent.VK_1;
@@ -324,5 +241,4 @@ public class IMEWrapper extends JDialog{
             default -> Keyboard.KEY_NONE;
         };
     }
-
 }

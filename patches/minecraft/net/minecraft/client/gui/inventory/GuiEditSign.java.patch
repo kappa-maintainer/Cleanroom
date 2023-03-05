@@ -1,11 +1,77 @@
 --- before/net/minecraft/client/gui/inventory/GuiEditSign.java
 +++ after/net/minecraft/client/gui/inventory/GuiEditSign.java
-@@ -15,7 +15,7 @@
+@@ -1,6 +1,7 @@
+ package net.minecraft.client.gui.inventory;
+ 
+-import java.io.IOException;
++import com.cleanroommc.client.ime.IMEWrapper;
++import com.cleanroommc.client.ime.IMEWrapperSign;
+ import net.minecraft.block.Block;
+ import net.minecraft.client.gui.GuiButton;
+ import net.minecraft.client.gui.GuiScreen;
+@@ -15,7 +16,10 @@
  import net.minecraft.util.text.TextComponentString;
  import net.minecraftforge.fml.relauncher.Side;
  import net.minecraftforge.fml.relauncher.SideOnly;
 -import org.lwjgl.input.Keyboard;
 +import org.lwjglx.input.Keyboard;
++import org.lwjglx.opengl.Display;
++
++import java.io.IOException;
  
  @SideOnly(Side.CLIENT)
  public class GuiEditSign extends GuiScreen
+@@ -24,10 +28,15 @@
+     private int field_146849_g;
+     private int field_146851_h;
+     private GuiButton field_146852_i;
+-
++    private int imeLine = -1;
+     public GuiEditSign(TileEntitySign p_i1097_1_)
+     {
+         this.field_146848_f = p_i1097_1_;
++        IMEWrapperSign.setSign(this, p_i1097_1_);
++    }
++
++    public int getEditLine() {
++        return field_146851_h;
+     }
+ 
+     public void func_73866_w_()
+@@ -36,6 +45,7 @@
+         Keyboard.enableRepeatEvents(true);
+         this.field_146852_i = this.func_189646_b(new GuiButton(0, this.field_146294_l / 2 - 100, this.field_146295_m / 4 + 120, I18n.func_135052_a("gui.done")));
+         this.field_146848_f.func_145913_a(false);
++        IMEWrapperSign.instance.setVisible(true);
+     }
+ 
+     public void func_146281_b()
+@@ -47,7 +57,8 @@
+         {
+             nethandlerplayclient.func_147297_a(new CPacketUpdateSign(this.field_146848_f.func_174877_v(), this.field_146848_f.field_145915_a));
+         }
+-
++        IMEWrapperSign.instance.setVisible(false);
++        IMEWrapperSign.textField.setText("");
+         this.field_146848_f.func_145913_a(true);
+     }
+ 
+@@ -108,7 +119,7 @@
+         GlStateManager.func_179094_E();
+         GlStateManager.func_179109_b((float)(this.field_146294_l / 2), 0.0F, 50.0F);
+         float f = 93.75F;
+-        GlStateManager.func_179152_a(-93.75F, -93.75F, -93.75F);
++        GlStateManager.func_179152_a(-f, -f, -f);
+         GlStateManager.func_179114_b(180.0F, 0.0F, 1.0F, 0.0F);
+         Block block = this.field_146848_f.func_145838_q();
+ 
+@@ -151,5 +162,9 @@
+         this.field_146848_f.field_145918_i = -1;
+         GlStateManager.func_179121_F();
+         super.func_73863_a(p_73863_1_, p_73863_2_, p_73863_3_);
++        if(imeLine != field_146851_h) {
++            imeLine = field_146851_h;
++            IMEWrapperSign.instance.setLocation(Display.getX() + Display.getWidth() / 2, (Display.getY() + imeLine * 10 + 18) * IMEWrapper.scaledResolution.func_78325_e());
++        }
+     }
+ }
