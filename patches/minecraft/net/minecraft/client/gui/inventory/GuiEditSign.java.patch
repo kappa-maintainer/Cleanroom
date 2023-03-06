@@ -71,7 +71,7 @@
          super.func_73863_a(p_73863_1_, p_73863_2_, p_73863_3_);
 +        if(imeLine != field_146851_h) {
 +            imeLine = field_146851_h;
-+            IMEWrapperSign.instance.setLocation(Display.getX() + Display.getWidth() / 2, (Display.getY() + imeLine * 10 + 18) * IMEWrapper.scaledResolution.func_78325_e());
++            IMEWrapperSign.instance.setLocation(Display.getX() + Display.getWidth() / 2, Display.getY() + (imeLine * 10 + 80) * IMEWrapper.scaledResolution.func_78325_e());
 +        }
      }
  }

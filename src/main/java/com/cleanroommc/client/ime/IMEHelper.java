@@ -1,13 +1,32 @@
 package com.cleanroommc.client.ime;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import org.lwjglx.input.Keyboard;
 
 import java.awt.event.KeyEvent;
 
 
 public class IMEHelper {
-    public static boolean isWrapperVisible() {
-        return IMEWrapper.instance.isVisible() || IMEWrapperSign.instance.isVisible();
+    public static void keepWrapperFocused() {
+        if (IMEWrapper.instance.isVisible()) {
+            IMEWrapper.instance.setVisible(false);
+            IMEWrapper.instance.setVisible(true);
+            return;
+        }
+        if (IMEWrapperBook.instance.isVisible()) {
+            IMEWrapperBook.instance.setVisible(false);
+            IMEWrapperBook.instance.setVisible(true);
+            return;
+        }
+        if (IMEWrapperSign.instance.isVisible()) {
+            IMEWrapperSign.instance.setVisible(false);
+            IMEWrapperSign.instance.setVisible(true);
+        }
+    }
+
+    public static boolean isAnyWrapperVisible() {
+        return IMEWrapperBook.instance.isVisible() || IMEWrapperSign.instance.isVisible() || IMEWrapper.instance.isVisible();
     }
 
     /*
@@ -240,5 +259,26 @@ public class IMEHelper {
             case Keyboard.KEY_LWIN -> KeyEvent.VK_META;
             default -> Keyboard.KEY_NONE;
         };
+    }
+
+    public static int getStringWidth(String str)
+    {
+        int i = str.length();
+        int j = 0;
+        int k = 0;
+        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+        for (;k < i; ++k)
+        {
+            char c0 = str.charAt(k);
+            j += fontRenderer.getCharWidth(c0);
+
+            if (c0 == '\n')
+            {
+                break;
+            }
+
+        }
+
+        return j;
     }
 }

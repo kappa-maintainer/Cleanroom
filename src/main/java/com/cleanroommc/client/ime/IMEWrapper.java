@@ -11,6 +11,7 @@ import org.lwjglx.opengl.Display;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -23,9 +24,12 @@ public class IMEWrapper extends JDialog{
 
     public static IMEWrapper instance = new IMEWrapper();
     private static GuiTextField guiTextField = null;
-    public static Consumer<GuiScreen> updater = gui -> {};
 
+    // Some gui needs update in typing, should pass these method to this lambda instead
+    public static Consumer<GuiScreen> updater = gui -> {};
+    // For converting two sets of coordinates, saved here for convenient
     public static ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+    // Threadsafety!
     public static void setTextField(GuiTextField fieldIn) {
         SwingUtilities.invokeLater(() -> guiTextField = fieldIn);
     }
@@ -40,7 +44,7 @@ public class IMEWrapper extends JDialog{
         this.setVisible(false);
         this.setAlwaysOnTop(true);
         this.setUndecorated(true);
-        this.setOpacity(0.98F);
+        this.setOpacity(1.0F);
         //JFrame.setDefaultLookAndFeelDecorated(true);
         this.setType(Type.POPUP);
         this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
@@ -86,14 +90,10 @@ public class IMEWrapper extends JDialog{
         textField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
-                //FMLLog.log.info("TYPED: " + keyEvent.getKeyCode());
-                //FMLLog.log.info("TYPED: " + getKeyText(keyEvent.getKeyCode()));
             }
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                //FMLLog.log.info("PRESSED: " + keyEvent.getKeyCode());
-                //FMLLog.log.info("PRESSED: " + getKeyText(keyEvent.getKeyCode()));
                 GuiScreen screen = Minecraft.getMinecraft().currentScreen;
                 switch (keyEvent.getKeyCode()) {
                     case KeyEvent.VK_TAB, KeyEvent.VK_ENTER, KeyEvent.VK_ESCAPE, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_PAGE_UP, KeyEvent.VK_PAGE_DOWN -> {
@@ -112,14 +112,10 @@ public class IMEWrapper extends JDialog{
 
             @Override
             public void keyReleased(KeyEvent keyEvent) {
-                //FMLLog.log.info("RELEASED: " + keyEvent.getKeyCode());
-                //FMLLog.log.info("RELEASED: " + getKeyText(keyEvent.getKeyCode()));
             }
         });
 
         textField.addCaretListener(caretEvent -> {
-            //FMLLog.log.info("DOT: " + caretEvent.getDot());
-            //FMLLog.log.info("MARK: " + caretEvent.getMark());
             guiTextField.setCursorPositionNoSync(textField.getCaretPosition());
             if (!Objects.equals(textField.getSelectedText(), "")) {
                 guiTextField.setSelection(textField.getCaret().getDot(), textField.getCaret().getMark());

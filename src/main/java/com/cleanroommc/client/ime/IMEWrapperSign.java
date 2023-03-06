@@ -3,7 +3,6 @@ package com.cleanroommc.client.ime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,9 +39,8 @@ public class IMEWrapperSign extends JDialog{
 
         this.setVisible(false);
         this.setAlwaysOnTop(true);
-        //this.setUndecorated(true);
-        //this.setOpacity(0.98F);
-        JFrame.setDefaultLookAndFeelDecorated(true);
+        this.setUndecorated(true);
+        this.setOpacity(0.98F);
         this.setType(Type.POPUP);
         this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -84,7 +82,7 @@ public class IMEWrapperSign extends JDialog{
                         if (guiEditSign != null) {
                             Minecraft.getMinecraft().addScheduledTask(() -> {
                                 try {
-                                    guiEditSign.invokeKeyTyped((char) 127, IMEHelper.translateFromAWT(keyEvent.getKeyCode()));
+                                    guiEditSign.invokeKeyTyped('\0', IMEHelper.translateFromAWT(keyEvent.getKeyCode()));
                                 } catch (IOException ignored) {}
                                 textField.setText(tileEntitySign.signText[guiEditSign.getEditLine()].getUnformattedText());
                                 textField.setCaretPosition(textField.getText().length());
