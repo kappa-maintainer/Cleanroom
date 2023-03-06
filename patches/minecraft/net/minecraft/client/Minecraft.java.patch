@@ -362,7 +362,15 @@
              Display.setVSyncEnabled(this.field_71474_y.field_74352_v);
              this.func_175601_h();
          }
-@@ -1676,6 +1668,8 @@
+@@ -1647,6 +1639,7 @@
+         if (this.field_71462_r != null)
+         {
+             ScaledResolution scaledresolution = new ScaledResolution(this);
++            IMEWrapper.scaledResolution = scaledresolution;
+             this.field_71462_r.func_175273_b(this, scaledresolution.func_78326_a(), scaledresolution.func_78328_b());
+         }
+ 
+@@ -1676,6 +1669,8 @@
              --this.field_71467_ac;
          }
  
@@ -371,7 +379,7 @@
          this.field_71424_I.func_76320_a("gui");
  
          if (!this.field_71445_n)
-@@ -1877,6 +1871,7 @@
+@@ -1877,6 +1872,7 @@
          }
  
          this.field_71424_I.func_76319_b();
@@ -379,7 +387,7 @@
          this.field_71423_H = func_71386_F();
      }
  
-@@ -1982,6 +1977,7 @@
+@@ -1982,6 +1978,7 @@
                      }
                  }
              }
@@ -387,7 +395,7 @@
          }
  
          this.func_184117_aA();
-@@ -2239,6 +2235,8 @@
+@@ -2239,6 +2236,8 @@
      {
          while (Mouse.next())
          {
@@ -396,7 +404,7 @@
              int i = Mouse.getEventButton();
              KeyBinding.func_74510_a(i - 100, Mouse.getEventButtonState());
  
-@@ -2294,6 +2292,7 @@
+@@ -2294,6 +2293,7 @@
                      this.field_71462_r.func_146274_d();
                  }
              }
@@ -404,7 +412,7 @@
          }
      }
  
-@@ -2304,6 +2303,7 @@
+@@ -2304,6 +2304,7 @@
  
      public void func_71371_a(String p_71371_1_, String p_71371_2_, @Nullable WorldSettings p_71371_3_)
      {
@@ -412,7 +420,7 @@
          this.func_71403_a((WorldClient)null);
          System.gc();
          ISaveHandler isavehandler = this.field_71469_aa.func_75804_a(p_71371_1_, false);
-@@ -2346,6 +2346,12 @@
+@@ -2346,6 +2347,12 @@
  
          while (!this.field_71437_Z.func_71200_ad())
          {
@@ -425,7 +433,7 @@
              String s = this.field_71437_Z.func_71195_b_();
  
              if (s != null)
-@@ -2371,8 +2377,14 @@
+@@ -2371,8 +2378,14 @@
          SocketAddress socketaddress = this.field_71437_Z.func_147137_ag().func_151270_a();
          NetworkManager networkmanager = NetworkManager.func_150722_a(socketaddress);
          networkmanager.func_150719_a(new NetHandlerLoginClient(networkmanager, this, (GuiScreen)null));
@@ -442,7 +450,7 @@
          this.field_71453_ak = networkmanager;
      }
  
-@@ -2383,6 +2395,8 @@
+@@ -2383,6 +2396,8 @@
  
      public void func_71353_a(@Nullable WorldClient p_71353_1_, String p_71353_2_)
      {
@@ -451,7 +459,7 @@
          if (p_71353_1_ == null)
          {
              NetHandlerPlayClient nethandlerplayclient = this.func_147114_u();
-@@ -2395,6 +2409,18 @@
+@@ -2395,6 +2410,18 @@
              if (this.field_71437_Z != null && this.field_71437_Z.func_175578_N())
              {
                  this.field_71437_Z.func_71263_m();
@@ -470,7 +478,7 @@
              }
  
              this.field_71437_Z = null;
-@@ -2418,6 +2444,7 @@
+@@ -2418,6 +2445,7 @@
              this.field_71456_v.func_181029_i();
              this.func_71351_a((ServerData)null);
              this.field_71455_al = false;
@@ -478,7 +486,7 @@
          }
  
          this.field_147127_av.func_147690_c();
-@@ -2434,6 +2461,7 @@
+@@ -2434,6 +2462,7 @@
          }
  
          TileEntityRendererDispatcher.field_147556_a.func_147543_a(p_71353_1_);
@@ -486,7 +494,7 @@
  
          if (p_71353_1_ != null)
          {
-@@ -2488,6 +2516,7 @@
+@@ -2488,6 +2517,7 @@
          EntityPlayerSP entityplayersp = this.field_71439_g;
          this.field_71439_g = this.field_71442_b.func_192830_a(this.field_71441_e, this.field_71439_g == null ? new StatisticsManager() : this.field_71439_g.func_146107_m(), this.field_71439_g == null ? new RecipeBook() : this.field_71439_g.func_192035_E());
          this.field_71439_g.func_184212_Q().func_187218_a(entityplayersp.func_184212_Q().func_187231_c());
@@ -494,7 +502,7 @@
          this.field_71439_g.field_71093_bK = p_71354_1_;
          this.field_175622_Z = this.field_71439_g;
          this.field_71439_g.func_70065_x();
-@@ -2535,159 +2564,8 @@
+@@ -2535,159 +2565,8 @@
      {
          if (this.field_71476_x != null && this.field_71476_x.field_72313_a != RayTraceResult.Type.MISS)
          {
@@ -656,7 +664,7 @@
          }
      }
  
-@@ -2834,6 +2712,7 @@
+@@ -2834,6 +2713,7 @@
          return field_71432_P;
      }
  
@@ -664,7 +672,7 @@
      public ListenableFuture<Object> func_175603_A()
      {
          return this.func_152344_a(new Runnable()
-@@ -3009,18 +2888,8 @@
+@@ -3009,18 +2889,8 @@
  
      public static int func_71369_N()
      {
@@ -685,7 +693,7 @@
      }
  
      public boolean func_70002_Q()
-@@ -3152,6 +3021,9 @@
+@@ -3152,6 +3022,9 @@
          }
          else if (this.field_71439_g != null)
          {
@@ -695,7 +703,7 @@
              if (this.field_71439_g.field_70170_p.field_73011_w instanceof WorldProviderHell)
              {
                  return MusicTicker.MusicType.NETHER;
-@@ -3181,11 +3053,11 @@
+@@ -3181,11 +3054,11 @@
              {
                  if (Keyboard.getEventKeyState())
                  {
@@ -709,7 +717,7 @@
                      {
                          this.field_71456_v.func_146158_b().func_146227_a(ScreenShotHelper.func_148260_a(this.field_71412_D, this.field_71443_c, this.field_71440_d, this.field_147124_at));
                      }
-@@ -3199,6 +3071,7 @@
+@@ -3199,6 +3072,7 @@
                          }
                      }
                  }
@@ -717,7 +725,7 @@
              }
          }
      }
-@@ -3328,6 +3201,12 @@
+@@ -3328,6 +3202,12 @@
          return this.field_184127_aH;
      }
  
@@ -730,7 +738,7 @@
      public boolean func_189648_am()
      {
          return this.field_71439_g != null && this.field_71439_g.func_175140_cp() || this.field_71474_y.field_178879_v;
-@@ -3341,5 +3220,10 @@
+@@ -3341,5 +3221,10 @@
      public Tutorial func_193032_ao()
      {
          return this.field_193035_aW;

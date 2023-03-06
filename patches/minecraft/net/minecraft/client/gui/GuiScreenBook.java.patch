@@ -182,7 +182,7 @@
 +            List<String> list = field_146289_q.func_78271_c(p_146457_1_, 118);
 +            String last = list.get(list.size() - 1);
 +            IMEWrapperBook.instance.setLocation(
-+                    Display.getX() + IMEWrapper.scaledResolution.func_78325_e() * (IMEHelper.getStringWidth(last) + 147)
++                    Display.getX() + Display.getWidth() / 2 + IMEWrapper.scaledResolution.func_78325_e() * (IMEHelper.getStringWidth(last) / 2 - 30)
 +                    , Display.getY() + IMEWrapper.scaledResolution.func_78325_e() * (field_146289_q.func_78267_b(p_146457_1_,118 ) + 30));
          }
      }

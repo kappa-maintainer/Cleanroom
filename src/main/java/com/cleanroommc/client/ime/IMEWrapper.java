@@ -29,7 +29,7 @@ public class IMEWrapper extends JDialog{
     public static Consumer<GuiScreen> updater = gui -> {};
     // For converting two sets of coordinates, saved here for convenient
     public static ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-    // Threadsafety!
+    // Thread safety!
     public static void setTextField(GuiTextField fieldIn) {
         SwingUtilities.invokeLater(() -> guiTextField = fieldIn);
     }
@@ -43,13 +43,14 @@ public class IMEWrapper extends JDialog{
 
         this.setVisible(false);
         this.setAlwaysOnTop(true);
-        this.setUndecorated(true);
-        this.setOpacity(1.0F);
+        this.setUndecorated(true); //Minimize to one pixel
+        this.setOpacity(1.0F); //Try to make it invisible
         //JFrame.setDefaultLookAndFeelDecorated(true);
         this.setType(Type.POPUP);
-        this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
+        this.setLocation(Display.getX(), Display.getY() + Display.getHeight()); //Default location
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         textField = new JTextField(){
+            //Prevent illegal movement exception
             @Override
             public void moveCaretPosition(int pos) {
                 if (pos > this.getDocument().getLength()) {
@@ -62,6 +63,7 @@ public class IMEWrapper extends JDialog{
         };
         textField.setFocusTraversalKeysEnabled(false);
         textField.requestFocusInWindow();
+        // Transfer all text changes to GuiTextField
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -87,6 +89,7 @@ public class IMEWrapper extends JDialog{
                 }
             }
         });
+        // Transfer all non-input key to GuiTextField. Use ScheduledTask to prevent cross thread crash
         textField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
@@ -114,7 +117,7 @@ public class IMEWrapper extends JDialog{
             public void keyReleased(KeyEvent keyEvent) {
             }
         });
-
+        // Cursor and selection syncing, may find better condition
         textField.addCaretListener(caretEvent -> {
             guiTextField.setCursorPositionNoSync(textField.getCaretPosition());
             if (!Objects.equals(textField.getSelectedText(), "")) {

@@ -277,6 +277,10 @@ public class IMEHelper {
                 break;
             }
 
+            if (c0 == '\u00a7') {
+                k++;
+            }
+
         }
 
         return j;
