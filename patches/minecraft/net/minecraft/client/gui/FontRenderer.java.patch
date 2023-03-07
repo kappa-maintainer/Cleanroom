@@ -1,15 +1,20 @@
 --- before/net/minecraft/client/gui/FontRenderer.java
 +++ after/net/minecraft/client/gui/FontRenderer.java
-@@ -10,6 +10,8 @@
- import java.util.List;
- import java.util.Locale;
- import java.util.Random;
+@@ -6,10 +6,9 @@
+ import java.awt.image.BufferedImage;
+ import java.io.Closeable;
+ import java.io.IOException;
+-import java.util.Arrays;
+-import java.util.List;
+-import java.util.Locale;
+-import java.util.Random;
++import java.util.*;
 +
 +import com.ibm.icu.text.BreakIterator;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.renderer.BufferBuilder;
  import net.minecraft.client.renderer.GlStateManager;
-@@ -26,10 +28,13 @@
+@@ -26,10 +25,13 @@
  import net.minecraftforge.fml.relauncher.SideOnly;
  import org.apache.commons.io.IOUtils;
  
@@ -23,7 +28,7 @@
      protected final int[] field_78286_d = new int[256];
      public int field_78288_b = 9;
      public Random field_78289_c = new Random();
-@@ -57,7 +62,7 @@
+@@ -57,7 +59,7 @@
          this.field_111273_g = p_i1035_2_;
          this.field_78298_i = p_i1035_3_;
          this.field_78293_l = p_i1035_4_;
@@ -32,7 +37,7 @@
  
          for (int i = 0; i < 32; ++i)
          {
-@@ -107,7 +112,7 @@
+@@ -107,7 +109,7 @@
  
          try
          {
@@ -41,7 +46,7 @@
              bufferedimage = TextureUtil.func_177053_a(iresource.func_110527_b());
          }
          catch (IOException ioexception)
-@@ -116,7 +121,7 @@
+@@ -116,7 +118,7 @@
          }
          finally
          {
@@ -50,7 +55,7 @@
          }
  
          int lvt_3_2_ = bufferedimage.getWidth();
-@@ -172,7 +177,7 @@
+@@ -172,7 +174,7 @@
  
          try
          {
@@ -59,7 +64,7 @@
              iresource.func_110527_b().read(this.field_78287_e);
          }
          catch (IOException ioexception)
-@@ -181,12 +186,13 @@
+@@ -181,12 +183,13 @@
          }
          finally
          {
@@ -74,7 +79,7 @@
          if (p_181559_1_ == ' ')
          {
              return 4.0F;
-@@ -203,7 +209,7 @@
+@@ -203,7 +206,7 @@
          int i = p_78266_1_ % 16 * 8;
          int j = p_78266_1_ / 16 * 8;
          int k = p_78266_2_ ? 1 : 0;
@@ -83,7 +88,7 @@
          int l = this.field_78286_d[p_78266_1_];
          float f = (float)l - 0.01F;
          GlStateManager.func_187447_r(5);
-@@ -231,7 +237,7 @@
+@@ -231,7 +234,7 @@
  
      private void func_78257_a(int p_78257_1_)
      {
@@ -92,7 +97,7 @@
      }
  
      protected float func_78277_a(char p_78277_1_, boolean p_78277_2_)
-@@ -280,7 +286,7 @@
+@@ -280,7 +283,7 @@
  
      public int func_175065_a(String p_175065_1_, float p_175065_2_, float p_175065_3_, int p_175065_4_, boolean p_175065_5_)
      {
@@ -101,7 +106,7 @@
          this.func_78265_b();
          int i;
  
-@@ -338,7 +344,7 @@
+@@ -338,7 +341,7 @@
                      this.field_78300_v = false;
                      this.field_78301_u = false;
  
@@ -110,7 +115,7 @@
                      {
                          i1 = 15;
                      }
-@@ -350,7 +356,7 @@
+@@ -350,7 +353,7 @@
  
                      int j1 = this.field_78285_g[i1];
                      this.field_78304_r = j1;
@@ -119,7 +124,7 @@
                  }
                  else if (i1 == 16)
                  {
-@@ -372,14 +378,13 @@
+@@ -372,14 +375,13 @@
                  {
                      this.field_78301_u = true;
                  }
@@ -136,7 +141,7 @@
                  }
  
                  ++i;
-@@ -393,21 +398,15 @@
+@@ -393,21 +395,15 @@
                      int k = this.func_78263_a(c0);
                      char c1;
  
@@ -161,7 +166,7 @@
                  boolean flag = (c0 == 0 || j == -1 || this.field_78293_l) && p_78255_2_;
  
                  if (flag)
-@@ -445,6 +444,15 @@
+@@ -445,6 +441,15 @@
  
                      ++f;
                  }
@@ -177,7 +182,7 @@
  
                  if (this.field_78299_w)
                  {
-@@ -452,10 +460,10 @@
+@@ -452,10 +457,10 @@
                      BufferBuilder bufferbuilder = tessellator.func_178180_c();
                      GlStateManager.func_179090_x();
                      bufferbuilder.func_181668_a(7, DefaultVertexFormats.field_181705_e);
@@ -192,7 +197,7 @@
                      tessellator.func_78381_a();
                      GlStateManager.func_179098_w();
                  }
-@@ -493,89 +501,75 @@
+@@ -493,89 +498,75 @@
  
      private int func_180455_b(String p_180455_1_, float p_180455_2_, float p_180455_3_, int p_180455_4_, boolean p_180455_5_)
      {
@@ -343,8 +348,108 @@
          if (p_78263_1_ == 167)
          {
              return -1;
-@@ -746,6 +740,10 @@
+@@ -723,9 +714,93 @@
  
+     public List<String> func_78271_c(String p_78271_1_, int p_78271_2_)
+     {
+-        return Arrays.<String>asList(this.func_78280_d(p_78271_1_, p_78271_2_).split("\n"));
+-    }
++        //return Arrays.asList(this.wrapFormattedStringToWidth(str, wrapWidth).split("\n"));
+ 
++        // They don't render and should not be feed into iterator
++        String cleanStr = p_78271_1_.replaceAll("§.", "").replaceAll("§", "");
++        BREAK_ITERATOR.setText(cleanStr);
++        List<String> list = new ArrayList<>();
++        String format = "";
++        StringBuilder nextFormat = new StringBuilder();
++        int i = 0, j = 0, k, l;
++        record Reset(int i, int ri){}
++        Stack<Reset> lastReset = new Stack<>();
++        lastReset.push(new Reset(0, 0));
++        int strWidth = 0;
++        int prevBreak = 0;
++        boolean bold = false;
++        char c, f, back;
++        int prevCandidate;
++        do {
++            switch (c = p_78271_1_.charAt(i)) {
++                case '\n' -> {
++                    list.add(nextFormat.substring(lastReset.peek().ri(), nextFormat.length()) + p_78271_1_.substring(prevBreak, i));
++                    format = nextFormat.toString();
++                    prevBreak = i + 1;
++                    strWidth = 0;
++                }
++                case '§' -> { // format start
++                    if (i + 1 < p_78271_1_.length()) { // Prevent out of bound
++                        f = p_78271_1_.charAt(++i);
++                        nextFormat.append('§').append(f); // Add to current format code
++                        if (f != 'l' && f != 'L') { // Check start of bold style
++                            if (f == 'r' || f == 'R' || func_78272_b(f)) { // Not Bold, check end of style
++                                bold = false;
++                                lastReset.push(new Reset(i - 1, nextFormat.length() - 1));
++                            }
++                        } else {
++                            bold = true;
++                        }
++                    }
++                }
++                default -> {
++                    strWidth += func_78263_a(c);
++                    if (bold) {
++                        // Bold style is fat
++                        strWidth += 1;
++                    }
++                }
++            }
++            if (strWidth > p_78271_2_) {
++                BREAK_ITERATOR.following(j);
++                prevCandidate = BREAK_ITERATOR.previous();
++                k = i;
++                l = j;
++                if (prevCandidate > DONE) {
++                    do {
++                        k--;
++                        l--;
++                        back = p_78271_1_.charAt(k);
++                        if (back == '§') {
++                            if (k == lastReset.peek().i()) {
++                                lastReset.pop();
++                            }
++                            nextFormat.delete(nextFormat.length() - 2, nextFormat.length());
++                            l++;
++                        }
++                    } while (l > prevCandidate);
++                }
++                if (k <= prevBreak) {
++                    k = i;
++                } else {
++                    k++;
++                }
++                list.add(nextFormat.substring(lastReset.peek().ri() * 2) + p_78271_1_.substring(prevBreak, k));
++                format = nextFormat.toString();
++                if (k != i) {
++                    j = prevCandidate;
++                }
++                prevBreak = k;
++                i = k;
++                strWidth = func_78263_a(c);
++            }
++            i++;
++            j++;
++        } while (i < p_78271_1_.length());
++        list.add(format + p_78271_1_.substring(prevBreak));
++        return list;
++    }
++    @Deprecated
+     String func_78280_d(String p_78280_1_, int p_78280_2_)
+     {
+         int i = this.func_78259_e(p_78280_1_, p_78280_2_);
+@@ -743,9 +818,13 @@
+             return s + "\n" + this.func_78280_d(s1, p_78280_2_);
+         }
+     }
+-
++    @Deprecated
      private int func_78259_e(String p_78259_1_, int p_78259_2_)
      {
 +        String cleanStr = p_78259_1_.replaceAll("§.", "").replaceAll("§", "");
@@ -354,7 +459,7 @@
          int i = p_78259_1_.length();
          int j = 0;
          int k = 0;
-@@ -755,48 +753,30 @@
+@@ -755,48 +834,30 @@
          {
              char c0 = p_78259_1_.charAt(k);
  
@@ -416,7 +521,7 @@
              }
  
              if (j > p_78259_2_)
-@@ -804,8 +784,19 @@
+@@ -804,8 +865,19 @@
                  break;
              }
          }
@@ -438,7 +543,7 @@
      }
  
      private static boolean func_78272_b(char p_78272_0_)
-@@ -820,7 +811,7 @@
+@@ -820,7 +892,7 @@
  
      public static String func_78282_e(String p_78282_0_)
      {
@@ -447,7 +552,7 @@
          int i = -1;
          int j = p_78282_0_.length();
  
-@@ -832,21 +823,41 @@
+@@ -832,21 +904,41 @@
  
                  if (func_78272_b(c0))
                  {

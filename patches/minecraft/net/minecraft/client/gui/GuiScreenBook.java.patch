@@ -174,20 +174,21 @@
          }
      }
  
-@@ -330,6 +321,12 @@
+@@ -330,27 +321,34 @@
          {
              this.field_146483_y.func_150304_a(this.field_146484_x, new NBTTagString(p_146457_1_));
              this.field_146481_r = true;
-+            p_146457_1_ = p_146457_1_ + '_';
-+            List<String> list = field_146289_q.func_78271_c(p_146457_1_, 118);
+-        }
++            /*p_146457_1_ = p_146457_1_ + '_';
++            List<String> list = fontRenderer.listFormattedStringToWidth(p_146457_1_, 118);
 +            String last = list.get(list.size() - 1);
 +            IMEWrapperBook.instance.setLocation(
-+                    Display.getX() + Display.getWidth() / 2 + IMEWrapper.scaledResolution.func_78325_e() * (IMEHelper.getStringWidth(last) / 2 - 30)
-+                    , Display.getY() + IMEWrapper.scaledResolution.func_78325_e() * (field_146289_q.func_78267_b(p_146457_1_,118 ) + 30));
-         }
++                    Display.getX() + Display.getWidth() / 2 + IMEWrapper.scaledResolution.getScaleFactor() * (IMEHelper.getStringWidth(last) / 2 - 30)
++                    , Display.getY() + IMEWrapper.scaledResolution.getScaleFactor() * (fontRenderer.getWordWrappedHeight(p_146457_1_,118 ) + 30));
++        */}
      }
  
-@@ -337,20 +334,21 @@
+     private void func_146459_b(String p_146459_1_)
      {
          String s = this.func_146456_p();
          String s1 = s + p_146459_1_;
