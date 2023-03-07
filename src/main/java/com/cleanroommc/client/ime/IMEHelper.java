@@ -261,28 +261,4 @@ public class IMEHelper {
         };
     }
 
-    public static int getStringWidth(String str)
-    {
-        int i = str.length();
-        int j = 0;
-        int k = 0;
-        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        for (;k < i; ++k)
-        {
-            char c0 = str.charAt(k);
-            j += fontRenderer.getCharWidth(c0);
-
-            if (c0 == '\n')
-            {
-                break;
-            }
-
-            if (c0 == '\u00a7') {
-                k++;
-            }
-
-        }
-
-        return j;
-    }
 }
