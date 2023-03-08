@@ -1,17 +1,23 @@
 package com.cleanroommc.client.ime;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import org.lwjglx.input.Keyboard;
 
 import java.awt.event.KeyEvent;
 
 
 public class IMEHelper {
+
+    public static ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+
+    public static int getFactor() {
+        return scaledResolution.getScaleFactor();
+    }
     public static void keepWrapperFocused() {
-        if (IMEWrapper.instance.isVisible()) {
-            IMEWrapper.instance.setVisible(false);
-            IMEWrapper.instance.setVisible(true);
+        if (IMEWrapperTextField.instance.isVisible()) {
+            IMEWrapperTextField.instance.setVisible(false);
+            IMEWrapperTextField.instance.setVisible(true);
             return;
         }
         if (IMEWrapperBook.instance.isVisible()) {
@@ -26,7 +32,7 @@ public class IMEHelper {
     }
 
     public static boolean isAnyWrapperVisible() {
-        return IMEWrapperBook.instance.isVisible() || IMEWrapperSign.instance.isVisible() || IMEWrapper.instance.isVisible();
+        return IMEWrapperBook.instance.isVisible() || IMEWrapperSign.instance.isVisible() || IMEWrapperTextField.instance.isVisible();
     }
 
     /*

@@ -16,37 +16,21 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
-public class IMEWrapperSign extends JDialog{
-    public static JTextField textField;
+public class IMEWrapperSign extends IMEWrapper{
 
     public static IMEWrapperSign instance = new IMEWrapperSign();
-    private static TileEntitySign tileEntitySign = null;
-    private static GuiEditSign guiEditSign = null;
+    private TileEntitySign tileEntitySign = null;
+    private GuiEditSign guiEditSign = null;
 
-    public static void setSign(GuiEditSign gui, TileEntitySign tile) {
+    public void setSign(GuiEditSign gui, TileEntitySign tile) {
         SwingUtilities.invokeLater(() -> {
             guiEditSign = gui;
             tileEntitySign = tile;
         });
     }
-
-    public static void setText(String text) {
-        SwingUtilities.invokeLater(() -> textField.setText(text));
-    }
-
-
     public IMEWrapperSign() {
-
-        this.setVisible(false);
-        this.setAlwaysOnTop(true);
-        this.setUndecorated(true);
-        this.setOpacity(0.98F);
-        this.setType(Type.POPUP);
-        this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        textField = new JTextField();
-        textField.setFocusTraversalKeysEnabled(false);
-        textField.requestFocusInWindow();
+        super();
+        this.add(textField);
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -54,14 +38,12 @@ public class IMEWrapperSign extends JDialog{
                     tileEntitySign.signText[guiEditSign.getEditLine()] = new TextComponentString(textField.getText());
                 }
             }
-
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 if (tileEntitySign != null) {
                     tileEntitySign.signText[guiEditSign.getEditLine()] = new TextComponentString(textField.getText());
                 }
             }
-
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 if (tileEntitySign != null) {
@@ -71,9 +53,7 @@ public class IMEWrapperSign extends JDialog{
         });
         textField.addKeyListener(new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent keyEvent) {
-            }
-
+            public void keyTyped(KeyEvent keyEvent) {}
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 switch (keyEvent.getKeyCode()) {
@@ -91,10 +71,8 @@ public class IMEWrapperSign extends JDialog{
                     }
                 }
             }
-
             @Override
-            public void keyReleased(KeyEvent keyEvent) {
-            }
+            public void keyReleased(KeyEvent keyEvent) {}
         });
 
         textField.addCaretListener(caretEvent -> {
@@ -102,8 +80,5 @@ public class IMEWrapperSign extends JDialog{
                 textField.setCaretPosition(textField.getText().length());
 
         });
-
-        this.add(textField);
-
     }
 }

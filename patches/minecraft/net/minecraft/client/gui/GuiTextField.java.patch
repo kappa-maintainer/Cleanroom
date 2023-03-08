@@ -1,15 +1,16 @@
 --- before/net/minecraft/client/gui/GuiTextField.java
 +++ after/net/minecraft/client/gui/GuiTextField.java
-@@ -1,7 +1,7 @@
+@@ -1,7 +1,8 @@
  package net.minecraft.client.gui;
  
-+import com.cleanroommc.client.ime.IMEWrapper;
++import com.cleanroommc.client.ime.IMEHelper;
++import com.cleanroommc.client.ime.IMEWrapperTextField;
  import com.google.common.base.Predicate;
 -import com.google.common.base.Predicates;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.renderer.BufferBuilder;
  import net.minecraft.client.renderer.GlStateManager;
-@@ -11,6 +11,9 @@
+@@ -11,6 +12,9 @@
  import net.minecraft.util.math.MathHelper;
  import net.minecraftforge.fml.relauncher.Side;
  import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,7 +20,7 @@
  
  @SideOnly(Side.CLIENT)
  public class GuiTextField extends Gui
-@@ -21,6 +24,8 @@
+@@ -21,6 +25,8 @@
      public int field_146210_g;
      public int field_146218_h;
      public int field_146219_i;
@@ -28,7 +29,7 @@
      private String field_146216_j = "";
      private int field_146217_k = 32;
      private int field_146214_l;
-@@ -35,7 +40,7 @@
+@@ -35,7 +41,7 @@
      private int field_146221_u = 7368816;
      private boolean field_146220_v = true;
      private GuiPageButtonList.GuiResponder field_175210_x;
@@ -37,7 +38,7 @@
  
      public GuiTextField(int p_i45542_1_, FontRenderer p_i45542_2_, int p_i45542_3_, int p_i45542_4_, int p_i45542_5_, int p_i45542_6_)
      {
-@@ -59,7 +64,7 @@
+@@ -59,7 +65,7 @@
  
      public void func_146180_a(String p_146180_1_)
      {
@@ -46,7 +47,7 @@
          {
              if (p_146180_1_.length() > this.field_146217_k)
              {
-@@ -69,11 +74,26 @@
+@@ -69,11 +75,26 @@
              {
                  this.field_146216_j = p_146180_1_;
              }
@@ -55,7 +56,7 @@
 -        }
 -    }
 -
-+            IMEWrapper.setText(this.field_146216_j);
++            IMEWrapperTextField.instance.setText(this.field_146216_j);
 +            this.func_146202_e();
 +        }
 +    }
@@ -78,7 +79,7 @@
      public String func_146179_b()
      {
          return this.field_146216_j;
-@@ -81,22 +101,22 @@
+@@ -81,22 +102,22 @@
  
      public String func_146207_c()
      {
@@ -106,7 +107,7 @@
          int k = this.field_146217_k - this.field_146216_j.length() - (i - j);
  
          if (!this.field_146216_j.isEmpty())
-@@ -122,9 +142,10 @@
+@@ -122,9 +143,10 @@
              s = s + this.field_146216_j.substring(j);
          }
  
@@ -114,11 +115,11 @@
 +        if (this.field_175209_y.test(s))
          {
              this.field_146216_j = s;
-+            IMEWrapper.setText(s);
++            IMEWrapperTextField.instance.setText(s);
              this.func_146182_d(i - this.field_146223_s + l);
              this.func_190516_a(this.field_175208_g, this.field_146216_j);
          }
-@@ -178,10 +199,10 @@
+@@ -178,10 +200,10 @@
                      s = s + this.field_146216_j.substring(j);
                  }
  
@@ -127,11 +128,11 @@
                  {
                      this.field_146216_j = s;
 -
-+                    IMEWrapper.setText(s);
++                    IMEWrapperTextField.instance.setText(s);
                      if (flag)
                      {
                          this.func_146182_d(p_146175_1_);
-@@ -254,7 +275,6 @@
+@@ -254,7 +276,6 @@
      {
          this.func_146190_e(this.field_146223_s + p_146182_1_);
      }
@@ -139,7 +140,7 @@
      public void func_146190_e(int p_146190_1_)
      {
          this.field_146224_r = p_146190_1_;
-@@ -262,7 +282,25 @@
+@@ -262,7 +283,25 @@
          this.field_146224_r = MathHelper.func_76125_a(this.field_146224_r, 0, i);
          this.func_146199_i(this.field_146224_r);
      }
@@ -151,21 +152,21 @@
 +    private void updateWrapperLocation() {
 +        SwingUtilities.invokeLater(
 +                () -> {
-+                    IMEWrapper.textField.moveCaretPosition(this.field_146224_r);
++                    IMEWrapperTextField.instance.getTextField().moveCaretPosition(this.field_146224_r);
 +                    GuiScreen s = Minecraft.func_71410_x().field_71462_r;
 +                    if(imeY == 0 || s == null) {
-+                        IMEWrapper.instance.setLocation(Display.getX(), Display.getY() + Display.getHeight());
++                        IMEWrapperTextField.instance.setLocation(Display.getX(), Display.getY() + Display.getHeight());
 +                        return;
 +                    }
-+                    int f = IMEWrapper.scaledResolution.func_78325_e();
-+                    IMEWrapper.instance.setLocation(Display.getX() + imeX * f, Display.getY() + imeY * f);
++                    int f = IMEHelper.getFactor();
++                    IMEWrapperTextField.instance.setLocation(Display.getX() + imeX * f, Display.getY() + imeY * f);
 +                }
 +        );
 +    }
      public void func_146196_d()
      {
          this.func_146190_e(0);
-@@ -312,123 +350,82 @@
+@@ -312,123 +351,82 @@
          }
          else
          {
@@ -327,7 +328,7 @@
              }
          }
      }
-@@ -521,7 +518,11 @@
+@@ -521,7 +519,11 @@
                      this.field_146211_a.func_175063_a("_", (float)k1, (float)i1, i);
                  }
              }
@@ -340,28 +341,29 @@
              if (k != j)
              {
                  int l1 = l + this.field_146211_a.func_78256_a(s.substring(0, k));
-@@ -579,6 +580,7 @@
+@@ -579,6 +581,7 @@
          if (this.field_146216_j.length() > p_146203_1_)
          {
              this.field_146216_j = this.field_146216_j.substring(0, p_146203_1_);
-+            IMEWrapper.setText(this.field_146216_j);
++            IMEWrapperTextField.instance.setText(this.field_146216_j);
          }
      }
  
-@@ -625,6 +627,12 @@
+@@ -625,6 +628,13 @@
          {
              Minecraft.func_71410_x().field_71462_r.func_193975_a(p_146195_1_);
          }
-+        IMEWrapper.setTextField(this);
-+        if (p_146195_1_ && !IMEWrapper.instance.isVisible()) {
-+            IMEWrapper.instance.setVisible(true);
-+        } else if(!p_146195_1_ && IMEWrapper.instance.isVisible()) {
-+            IMEWrapper.instance.setVisible(false);
++        IMEWrapperTextField.instance.setGuiTextField(this);
++        if (p_146195_1_ && !IMEWrapperTextField.instance.isVisible()) {
++            IMEWrapperTextField.instance.setVisible(true);
++            IMEWrapperTextField.instance.setText(field_146216_j);
++        } else if(!p_146195_1_ && IMEWrapperTextField.instance.isVisible()) {
++            IMEWrapperTextField.instance.setVisible(false);
 +        }
      }
  
      public boolean func_146206_l()
-@@ -662,36 +670,34 @@
+@@ -662,36 +672,34 @@
          }
  
          this.field_146223_s = p_146199_1_;

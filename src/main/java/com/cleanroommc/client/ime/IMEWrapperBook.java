@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjglx.opengl.Display;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,79 +13,66 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
-public class IMEWrapperBook extends JDialog{
-    public static JTextArea textField;
+public class IMEWrapperBook extends IMEWrapper{
+    private JTextArea textArea;
 
     public static IMEWrapperBook instance = new IMEWrapperBook();
-    private static GuiScreenBook guiScreenBook = null;
+    private GuiScreenBook guiScreenBook = null;
 
-    public static void setBookGui(GuiScreenBook gui) {
+    public void setBookGui(GuiScreenBook gui) {
         SwingUtilities.invokeLater(() -> {
             guiScreenBook = gui;
         });
     }
 
-    public static void setText(String text) {
+    @Override
+    public void setText(String text) {
         SwingUtilities.invokeLater(() -> {
-            textField.setText(text);
-            textField.setCaretPosition(text.length());
+            textArea.setText(text);
+            textArea.setCaretPosition(text.length());
         });
     }
 
     public IMEWrapperBook() {
-
-        this.setVisible(false);
-        this.setAlwaysOnTop(true);
-        this.setUndecorated(true);
-        this.setOpacity(0.98F);
-        this.setType(Type.POPUP);
-        this.setLocation(Display.getX(), Display.getY() + Display.getHeight());
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        textField = new JTextArea();
-        textField.setFocusTraversalKeysEnabled(false);
-        textField.requestFocusInWindow();
-        textField.getDocument().addDocumentListener(new DocumentListener() {
+        super();
+        textArea = new JTextArea();
+        textArea.setFocusTraversalKeysEnabled(false);
+        textArea.requestFocusInWindow();
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 if (guiScreenBook != null) {
-                    String s = textField.getText();
+                    String s = textArea.getText();
                     if(guiScreenBook.canPageSet(s)) {
                         guiScreenBook.pageSetCurrent(s);
                     } else {
-                        textField.setText(s.substring(0, s.length() - 1));
+                        textArea.setText(s.substring(0, s.length() - documentEvent.getLength()));
                     }
                 }
             }
-
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 if (guiScreenBook != null) {
-                    String s = textField.getText();
-                    if(guiScreenBook.canPageSet(s)) {
-                        guiScreenBook.pageSetCurrent(s);
-                    } else {
-                        textField.setText(s.substring(0, s.length() - 1));
-                    }
+                    String s = textArea.getText();
+                    guiScreenBook.pageSetCurrent(s);
+
                 }
             }
-
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 if (guiScreenBook != null) {
-                    String s = textField.getText();
+                    String s = textArea.getText();
                     if(guiScreenBook.canPageSet(s)) {
                         guiScreenBook.pageSetCurrent(s);
                     } else {
-                        textField.setText(s.substring(0, s.length() - 1));
+                        textArea.setText(s.substring(0, s.length() - documentEvent.getLength()));
                     }
                 }
             }
         });
-        textField.addKeyListener(new KeyListener() {
+        textArea.addKeyListener(new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent keyEvent) {
-            }
-
+            public void keyTyped(KeyEvent keyEvent) {}
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 switch (keyEvent.getKeyCode()) {
@@ -104,19 +90,13 @@ public class IMEWrapperBook extends JDialog{
                     }
                 }
             }
-
             @Override
-            public void keyReleased(KeyEvent keyEvent) {
-            }
+            public void keyReleased(KeyEvent keyEvent) {}
         });
-
-        textField.addCaretListener(caretEvent -> {
-            if(textField.getCaretPosition() < textField.getText().length())
-                textField.setCaretPosition(textField.getText().length());
-
+        textArea.addCaretListener(caretEvent -> {
+            if(textArea.getCaretPosition() < textArea.getText().length())
+                textArea.setCaretPosition(textArea.getText().length());
         });
-
-        this.add(textField);
-
+        this.add(textArea);
     }
 }

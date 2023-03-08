@@ -1,23 +1,20 @@
 --- before/net/minecraft/client/gui/GuiScreenBook.java
 +++ after/net/minecraft/client/gui/GuiScreenBook.java
-@@ -1,11 +1,16 @@
+@@ -1,11 +1,10 @@
  package net.minecraft.client.gui;
  
 +import com.cleanroommc.client.ime.IMEHelper;
-+import com.cleanroommc.client.ime.IMEWrapper;
 +import com.cleanroommc.client.ime.IMEWrapperBook;
  import com.google.common.collect.Lists;
  import com.google.gson.JsonParseException;
  import io.netty.buffer.Unpooled;
- import java.io.IOException;
- import java.util.List;
- import javax.annotation.Nullable;
-+import javax.swing.*;
-+
+-import java.io.IOException;
+-import java.util.List;
+-import javax.annotation.Nullable;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.renderer.GlStateManager;
  import net.minecraft.client.resources.I18n;
-@@ -25,14 +30,12 @@
+@@ -25,14 +24,17 @@
  import net.minecraft.util.text.event.ClickEvent;
  import net.minecraftforge.fml.relauncher.Side;
  import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,6 +23,11 @@
 -import org.lwjgl.input.Keyboard;
 +import org.lwjglx.input.Keyboard;
 +import org.lwjglx.opengl.Display;
++
++import javax.annotation.Nullable;
++import javax.swing.*;
++import java.io.IOException;
++import java.util.List;
  
  @SideOnly(Side.CLIENT)
  public class GuiScreenBook extends GuiScreen
@@ -34,7 +36,7 @@
      private static final ResourceLocation field_146466_f = new ResourceLocation("textures/gui/book.png");
      private final EntityPlayer field_146468_g;
      private final ItemStack field_146474_h;
-@@ -69,6 +72,7 @@
+@@ -69,6 +71,7 @@
  
              if (this.field_146476_w < 1)
              {
@@ -42,18 +44,18 @@
                  this.field_146476_w = 1;
              }
          }
-@@ -98,6 +102,10 @@
+@@ -98,6 +101,10 @@
              this.field_146472_C = this.func_189646_b(new GuiButton(0, this.field_146294_l / 2 + 2, 196, 98, 20, I18n.func_135052_a("gui.done")));
              this.field_146467_E = this.func_189646_b(new GuiButton(5, this.field_146294_l / 2 - 100, 196, 98, 20, I18n.func_135052_a("book.finalizeButton")));
              this.field_146469_F = this.func_189646_b(new GuiButton(4, this.field_146294_l / 2 + 2, 196, 98, 20, I18n.func_135052_a("gui.cancel")));
-+            IMEWrapperBook.setBookGui(this);
-+            IMEWrapperBook.setText(func_146456_p());
++            IMEWrapperBook.instance.setBookGui(this);
++            IMEWrapperBook.instance.setText(func_146456_p());
 +            IMEWrapperBook.instance.setVisible(true);
 +            this.func_146457_a(this.func_146456_p());
          }
          else
          {
-@@ -105,15 +113,15 @@
+@@ -105,15 +112,15 @@
          }
  
          int i = (this.field_146294_l - 192) / 2;
@@ -72,7 +74,7 @@
      }
  
      private void func_146464_h()
-@@ -131,7 +139,7 @@
+@@ -131,7 +138,7 @@
          }
      }
  
@@ -81,7 +83,7 @@
      {
          if (this.field_146475_i && this.field_146481_r)
          {
-@@ -214,13 +222,13 @@
+@@ -214,13 +221,13 @@
              else if (p_146284_1_.field_146127_k == 5 && this.field_146480_s)
              {
                  this.func_146462_a(true);
@@ -93,11 +95,11 @@
                  this.field_146480_s = false;
              }
 -
-+            IMEWrapperBook.setText(func_146456_p());
++            IMEWrapperBook.instance.setText(func_146456_p());
              this.func_146464_h();
          }
      }
-@@ -260,62 +268,47 @@
+@@ -260,62 +267,47 @@
          }
          else
          {
@@ -182,17 +184,20 @@
          }
      }
  
-@@ -330,6 +323,9 @@
+@@ -330,6 +322,12 @@
          {
              this.field_146483_y.func_150304_a(this.field_146484_x, new NBTTagString(p_146457_1_));
              this.field_146481_r = true;
-+            SwingUtilities.invokeLater(() -> IMEWrapperBook.instance.setLocation(
-+                    Display.getX() + Display.getWidth() / 2 + IMEWrapper.scaledResolution.func_78325_e() * (field_146289_q.lastX - 60)
-+                    , Display.getY() + IMEWrapper.scaledResolution.func_78325_e() * (field_146289_q.lastY + 30)));
++            Minecraft.func_71410_x().func_152344_a(() ->
++                SwingUtilities.invokeLater(() -> IMEWrapperBook.instance.setLocation(
++                        Display.getX() + Display.getWidth() / 2 + IMEHelper.getFactor() * (field_146289_q.lastX - 64)
++                        , Display.getY() + IMEHelper.getFactor() * (field_146289_q.lastY + 30))
++                )
++            );
          }
      }
  
-@@ -337,20 +333,21 @@
+@@ -337,20 +335,21 @@
      {
          String s = this.func_146456_p();
          String s1 = s + p_146459_1_;
@@ -218,15 +223,15 @@
          this.func_73729_b(i, 2, 0, 0, 192, 192);
  
          if (this.field_146480_s)
-@@ -492,6 +489,7 @@
+@@ -492,6 +491,7 @@
                  {
                      this.field_146484_x = i;
                      this.func_146464_h();
-+                    IMEWrapperBook.setText(func_146456_p());
++                    IMEWrapperBook.instance.setText(func_146456_p());
                      return true;
                  }
              }
-@@ -508,7 +506,7 @@
+@@ -508,7 +508,7 @@
  
              if (flag && clickevent.func_150669_a() == ClickEvent.Action.RUN_COMMAND)
              {
