@@ -1,46 +1,6 @@
 --- before/net/minecraft/client/gui/FontRenderer.java
 +++ after/net/minecraft/client/gui/FontRenderer.java
-@@ -3,13 +3,7 @@
- import com.ibm.icu.text.ArabicShaping;
- import com.ibm.icu.text.ArabicShapingException;
- import com.ibm.icu.text.Bidi;
--import java.awt.image.BufferedImage;
--import java.io.Closeable;
--import java.io.IOException;
--import java.util.Arrays;
--import java.util.List;
--import java.util.Locale;
--import java.util.Random;
-+import com.ibm.icu.text.BreakIterator;
- import net.minecraft.client.Minecraft;
- import net.minecraft.client.renderer.BufferBuilder;
- import net.minecraft.client.renderer.GlStateManager;
-@@ -26,10 +20,16 @@
- import net.minecraftforge.fml.relauncher.SideOnly;
- import org.apache.commons.io.IOUtils;
- 
-+import java.awt.image.BufferedImage;
-+import java.io.IOException;
-+import java.util.*;
-+
-+
- @SideOnly(Side.CLIENT)
- public class FontRenderer implements IResourceManagerReloadListener
- {
-     private static final ResourceLocation[] field_111274_c = new ResourceLocation[256];
-+    private static final BreakIterator BREAK_ITERATOR = BreakIterator.getLineInstance();
-     protected final int[] field_78286_d = new int[256];
-     public int field_78288_b = 9;
-     public Random field_78289_c = new Random();
-@@ -52,12 +52,15 @@
-     private boolean field_78300_v;
-     private boolean field_78299_w;
- 
-+    public int lastX;
-+    public int lastY;
-+
-     public FontRenderer(GameSettings p_i1035_1_, ResourceLocation p_i1035_2_, TextureManager p_i1035_3_, boolean p_i1035_4_)
-     {
+@@ -57,7 +57,7 @@
          this.field_111273_g = p_i1035_2_;
          this.field_78298_i = p_i1035_3_;
          this.field_78293_l = p_i1035_4_;
@@ -49,7 +9,7 @@
  
          for (int i = 0; i < 32; ++i)
          {
-@@ -107,7 +110,7 @@
+@@ -107,7 +107,7 @@
  
          try
          {
@@ -58,16 +18,7 @@
              bufferedimage = TextureUtil.func_177053_a(iresource.func_110527_b());
          }
          catch (IOException ioexception)
-@@ -116,7 +119,7 @@
-         }
-         finally
-         {
--            IOUtils.closeQuietly((Closeable)iresource);
-+            IOUtils.closeQuietly(iresource);
-         }
- 
-         int lvt_3_2_ = bufferedimage.getWidth();
-@@ -172,7 +175,7 @@
+@@ -172,7 +172,7 @@
  
          try
          {
@@ -76,14 +27,7 @@
              iresource.func_110527_b().read(this.field_78287_e);
          }
          catch (IOException ioexception)
-@@ -181,12 +184,13 @@
-         }
-         finally
-         {
--            IOUtils.closeQuietly((Closeable)iresource);
-+            IOUtils.closeQuietly(iresource);
-         }
-     }
+@@ -187,6 +187,7 @@
  
      private float func_181559_a(char p_181559_1_, boolean p_181559_2_)
      {
@@ -91,7 +35,7 @@
          if (p_181559_1_ == ' ')
          {
              return 4.0F;
-@@ -203,7 +207,7 @@
+@@ -203,7 +204,7 @@
          int i = p_78266_1_ % 16 * 8;
          int j = p_78266_1_ / 16 * 8;
          int k = p_78266_2_ ? 1 : 0;
@@ -100,7 +44,7 @@
          int l = this.field_78286_d[p_78266_1_];
          float f = (float)l - 0.01F;
          GlStateManager.func_187447_r(5);
-@@ -231,7 +235,7 @@
+@@ -231,7 +232,7 @@
  
      private void func_78257_a(int p_78257_1_)
      {
@@ -109,7 +53,7 @@
      }
  
      protected float func_78277_a(char p_78277_1_, boolean p_78277_2_)
-@@ -280,7 +284,7 @@
+@@ -280,7 +281,7 @@
  
      public int func_175065_a(String p_175065_1_, float p_175065_2_, float p_175065_3_, int p_175065_4_, boolean p_175065_5_)
      {
@@ -118,16 +62,7 @@
          this.func_78265_b();
          int i;
  
-@@ -338,7 +342,7 @@
-                     this.field_78300_v = false;
-                     this.field_78301_u = false;
- 
--                    if (i1 < 0 || i1 > 15)
-+                    if (i1 < 0)
-                     {
-                         i1 = 15;
-                     }
-@@ -350,7 +354,7 @@
+@@ -350,7 +351,7 @@
  
                      int j1 = this.field_78285_g[i1];
                      this.field_78304_r = j1;
@@ -136,15 +71,7 @@
                  }
                  else if (i1 == 16)
                  {
-@@ -372,14 +376,13 @@
-                 {
-                     this.field_78301_u = true;
-                 }
--                else if (i1 == 21)
--                {
-+                else {
-                     this.field_78303_s = false;
-                     this.field_78302_t = false;
+@@ -379,7 +380,7 @@
                      this.field_78299_w = false;
                      this.field_78300_v = false;
                      this.field_78301_u = false;
@@ -153,23 +80,7 @@
                  }
  
                  ++i;
-@@ -393,21 +396,15 @@
-                     int k = this.func_78263_a(c0);
-                     char c1;
- 
--                    while (true)
--                    {
-+                    do {
-                         j = this.field_78289_c.nextInt("\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".length());
-                         c1 = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".charAt(j);
--
--                        if (k == this.func_78263_a(c1))
--                        {
--                            break;
--                        }
--                    }
-+                    } while (k != this.func_78263_a(c1));
- 
+@@ -407,7 +408,7 @@
                      c0 = c1;
                  }
  
@@ -178,7 +89,7 @@
                  boolean flag = (c0 == 0 || j == -1 || this.field_78293_l) && p_78255_2_;
  
                  if (flag)
-@@ -445,6 +442,15 @@
+@@ -445,6 +446,15 @@
  
                      ++f;
                  }
@@ -194,165 +105,16 @@
  
                  if (this.field_78299_w)
                  {
-@@ -452,10 +458,10 @@
-                     BufferBuilder bufferbuilder = tessellator.func_178180_c();
-                     GlStateManager.func_179090_x();
-                     bufferbuilder.func_181668_a(7, DefaultVertexFormats.field_181705_e);
--                    bufferbuilder.func_181662_b((double)this.field_78295_j, (double)(this.field_78296_k + (float)(this.field_78288_b / 2)), 0.0D).func_181675_d();
--                    bufferbuilder.func_181662_b((double)(this.field_78295_j + f), (double)(this.field_78296_k + (float)(this.field_78288_b / 2)), 0.0D).func_181675_d();
--                    bufferbuilder.func_181662_b((double)(this.field_78295_j + f), (double)(this.field_78296_k + (float)(this.field_78288_b / 2) - 1.0F), 0.0D).func_181675_d();
--                    bufferbuilder.func_181662_b((double)this.field_78295_j, (double)(this.field_78296_k + (float)(this.field_78288_b / 2) - 1.0F), 0.0D).func_181675_d();
-+                    bufferbuilder.func_181662_b(this.field_78295_j, this.field_78296_k + (float)(this.field_78288_b / 2), 0.0D).func_181675_d();
-+                    bufferbuilder.func_181662_b(this.field_78295_j + f, this.field_78296_k + (float)(this.field_78288_b / 2), 0.0D).func_181675_d();
-+                    bufferbuilder.func_181662_b(this.field_78295_j + f, this.field_78296_k + (float)(this.field_78288_b / 2) - 1.0F, 0.0D).func_181675_d();
-+                    bufferbuilder.func_181662_b(this.field_78295_j, this.field_78296_k + (float)(this.field_78288_b / 2) - 1.0F, 0.0D).func_181675_d();
-                     tessellator.func_78381_a();
-                     GlStateManager.func_179098_w();
-                 }
-@@ -493,89 +499,75 @@
- 
-     private int func_180455_b(String p_180455_1_, float p_180455_2_, float p_180455_3_, int p_180455_4_, boolean p_180455_5_)
-     {
--        if (p_180455_1_ == null)
--        {
--            return 0;
--        }
--        else
--        {
--            if (this.field_78294_m)
--            {
--                p_180455_1_ = this.func_147647_b(p_180455_1_);
--            }
--
--            if ((p_180455_4_ & -67108864) == 0)
--            {
--                p_180455_4_ |= -16777216;
--            }
--
--            if (p_180455_5_)
--            {
--                p_180455_4_ = (p_180455_4_ & 16579836) >> 2 | p_180455_4_ & -16777216;
--            }
--
--            this.field_78291_n = (float)(p_180455_4_ >> 16 & 255) / 255.0F;
--            this.field_78292_o = (float)(p_180455_4_ >> 8 & 255) / 255.0F;
--            this.field_78306_p = (float)(p_180455_4_ & 255) / 255.0F;
--            this.field_78305_q = (float)(p_180455_4_ >> 24 & 255) / 255.0F;
+@@ -518,7 +528,7 @@
+             this.field_78292_o = (float)(p_180455_4_ >> 8 & 255) / 255.0F;
+             this.field_78306_p = (float)(p_180455_4_ & 255) / 255.0F;
+             this.field_78305_q = (float)(p_180455_4_ >> 24 & 255) / 255.0F;
 -            GlStateManager.func_179131_c(this.field_78291_n, this.field_78292_o, this.field_78306_p, this.field_78305_q);
--            this.field_78295_j = p_180455_2_;
--            this.field_78296_k = p_180455_3_;
--            this.func_78255_a(p_180455_1_, p_180455_5_);
--            return (int)this.field_78295_j;
--        }
-+        if (this.field_78294_m) {
-+            p_180455_1_ = this.func_147647_b(p_180455_1_);
-+        }
-+
-+        if ((p_180455_4_ & -67108864) == 0)
-+        {
-+            p_180455_4_ |= -16777216;
-+        }
-+
-+        if (p_180455_5_)
-+        {
-+            p_180455_4_ = (p_180455_4_ & 16579836) >> 2 | p_180455_4_ & -16777216;
-+        }
-+
-+        this.field_78291_n = (float)(p_180455_4_ >> 16 & 255) / 255.0F;
-+        this.field_78292_o = (float)(p_180455_4_ >> 8 & 255) / 255.0F;
-+        this.field_78306_p = (float)(p_180455_4_ & 255) / 255.0F;
-+        this.field_78305_q = (float)(p_180455_4_ >> 24 & 255) / 255.0F;
-+        setColor(this.field_78291_n, this.field_78292_o, this.field_78306_p, this.field_78305_q);
-+        this.field_78295_j = p_180455_2_;
-+        this.field_78296_k = p_180455_3_;
-+        this.func_78255_a(p_180455_1_, p_180455_5_);
-+        return (int)this.field_78295_j;
-     }
- 
-     public int func_78256_a(String p_78256_1_)
-     {
--        if (p_78256_1_ == null)
--        {
--            return 0;
--        }
--        else
--        {
--            int i = 0;
--            boolean flag = false;
--
--            for (int j = 0; j < p_78256_1_.length(); ++j)
--            {
--                char c0 = p_78256_1_.charAt(j);
--                int k = this.func_78263_a(c0);
--
--                if (k < 0 && j < p_78256_1_.length() - 1)
--                {
--                    ++j;
--                    c0 = p_78256_1_.charAt(j);
--
--                    if (c0 != 'l' && c0 != 'L')
--                    {
--                        if (c0 == 'r' || c0 == 'R')
--                        {
--                            flag = false;
--                        }
--                    }
--                    else
--                    {
--                        flag = true;
--                    }
--
--                    k = 0;
--                }
--
--                i += k;
--
--                if (flag && k > 0)
--                {
--                    ++i;
--                }
--            }
--
--            return i;
--        }
-+        int i = 0;
-+        boolean flag = false;
-+
-+        for (int j = 0; j < p_78256_1_.length(); ++j)
-+        {
-+            char c0 = p_78256_1_.charAt(j);
-+            int k = this.func_78263_a(c0);
-+
-+            if (k < 0 && j < p_78256_1_.length() - 1)
-+            {
-+                ++j;
-+                c0 = p_78256_1_.charAt(j);
-+
-+                if (c0 != 'l' && c0 != 'L')
-+                {
-+                    if (c0 == 'r' || c0 == 'R')
-+                    {
-+                        flag = false;
-+                    }
-+                }
-+                else
-+                {
-+                    flag = true;
-+                }
-+
-+                k = 0;
-+            }
-+
-+            i += k;
-+
-+            if (flag && k > 0)
-+            {
-+                ++i;
-+            }
-+        }
-+
-+        return i;
-     }
++            setColor(this.field_78291_n, this.field_78292_o, this.field_78306_p, this.field_78305_q);
+             this.field_78295_j = p_180455_2_;
+             this.field_78296_k = p_180455_3_;
+             this.func_78255_a(p_180455_1_, p_180455_5_);
+@@ -576,6 +586,7 @@
  
      public int func_78263_a(char p_78263_1_)
      {
@@ -360,232 +122,7 @@
          if (p_78263_1_ == 167)
          {
              return -1;
-@@ -723,9 +715,96 @@
- 
-     public List<String> func_78271_c(String p_78271_1_, int p_78271_2_)
-     {
--        return Arrays.<String>asList(this.func_78280_d(p_78271_1_, p_78271_2_).split("\n"));
--    }
-+        //return Arrays.asList(this.wrapFormattedStringToWidth(str, wrapWidth).split("\n"));
- 
-+        // They don't render and should not be feed into iterator
-+        String cleanStr = p_78271_1_.replaceAll("§.", "").replaceAll("§", "");
-+        BREAK_ITERATOR.setText(cleanStr);
-+        List<String> list = new ArrayList<>();
-+        String format = ""; // For last line's format since it should use format of previous line
-+        StringBuilder nextFormat = new StringBuilder();
-+        int i = 0, j = 0, k, l;
-+        record Reset(int i, int ri){}
-+        Stack<Reset> lastReset = new Stack<>();
-+        lastReset.push(new Reset(0, 0));
-+        int strWidth = 0;
-+        int prevBreak = 0;
-+        boolean bold = false;
-+        char c, f, back;
-+        int prevCandidate;
-+        do {
-+            switch (c = p_78271_1_.charAt(i)) {
-+                case '\n' -> {
-+                    list.add(nextFormat.substring(lastReset.peek().ri()) + p_78271_1_.substring(prevBreak, i));
-+                    format = nextFormat.toString();
-+                    prevBreak = i + 1;
-+                    strWidth = 0;
-+                }
-+                case '§' -> { // format start
-+                    if (i + 1 < p_78271_1_.length()) { // Prevent out of bound
-+                        f = p_78271_1_.charAt(++i);
-+                        nextFormat.append('§').append(f); // Add to current format code
-+                        if (f != 'l' && f != 'L') { // Check start of bold style
-+                            if (f == 'r' || f == 'R' || func_78272_b(f)) { // Not Bold, check end of style
-+                                bold = false;
-+                                lastReset.push(new Reset(i - 1, nextFormat.length())); // push reset location in str and format to stack
-+                            }
-+                        } else {
-+                            bold = true;
-+                        }
-+                    }
-+                }
-+                default -> {
-+                    strWidth += func_78263_a(c);
-+                    if (bold) {
-+                        // Bold style is fat
-+                        strWidth += 1;
-+                    }
-+                }
-+            }
-+            if (strWidth > p_78271_2_) {
-+                BREAK_ITERATOR.following(j); // The legal break right after j
-+                prevCandidate = BREAK_ITERATOR.previous(); // Find the nearest legit break
-+                k = i;
-+                l = j;
-+                if (prevCandidate > -1) {
-+                    while (l > prevCandidate && k > 0) { // Backward searching to get actual format at break
-+                        k--;
-+                        l--;
-+                        back = p_78271_1_.charAt(k);
-+                        if (back == '§') {
-+                            if (k == lastReset.peek().i()) {
-+                                lastReset.pop(); // Remove reset
-+                            }
-+                            nextFormat.delete(nextFormat.length() - 2, nextFormat.length()); // Remove format
-+                            l++;
-+                        }
-+                    }
-+                }
-+                if (k <= prevBreak) {
-+                    k = i; // Break in previous line, not usable, set it to current i
-+                }
-+                if (p_78271_1_.charAt(k - 1) == '§') {
-+                    k--; // Make sure not to break in format code. Can't figure out how to put it in while(), so
-+                }
-+                list.add(nextFormat.substring(lastReset.peek().ri()) + p_78271_1_.substring(prevBreak, k));
-+                format = nextFormat.toString();
-+                if (k != i) {
-+                    j = prevCandidate; // k!=i means usable break point found, j should back to corresponding location
-+                }
-+                prevBreak = k;
-+                i = k;
-+                strWidth = func_78263_a(c); // Width of first char of new line.
-+            }
-+            i++;
-+            j++;
-+        } while (i < p_78271_1_.length());
-+        list.add(format + p_78271_1_.substring(prevBreak));
-+        lastX = strWidth;
-+        lastY = field_78288_b * list.size();
-+        return list;
-+    }
-+    @Deprecated
-     String func_78280_d(String p_78280_1_, int p_78280_2_)
-     {
-         int i = this.func_78259_e(p_78280_1_, p_78280_2_);
-@@ -743,9 +822,13 @@
-             return s + "\n" + this.func_78280_d(s1, p_78280_2_);
-         }
-     }
--
-+    @Deprecated
-     private int func_78259_e(String p_78259_1_, int p_78259_2_)
-     {
-+        String cleanStr = p_78259_1_.replaceAll("§.", "").replaceAll("§", "");
-+        BREAK_ITERATOR.setText(cleanStr);
-+        int sectionCount = 0;
-+        int m = 0;
-         int i = p_78259_1_.length();
-         int j = 0;
-         int k = 0;
-@@ -755,48 +838,30 @@
-         {
-             char c0 = p_78259_1_.charAt(k);
- 
--            switch (c0)
--            {
--                case '\n':
--                    --k;
--                    break;
--                case ' ':
--                    l = k;
--                default:
-+            switch (c0) {
-+                case '\n' -> --k;
-+                default -> {
-                     j += this.func_78263_a(c0);
--
--                    if (flag)
--                    {
-+                    if (flag) {
-                         ++j;
-                     }
--
--                    break;
--                case '\u00a7':
--
--                    if (k < i - 1)
--                    {
-+                }
-+                case '\u00a7' -> {
-+                    sectionCount++;
-+                    if (k < i - 1) {
-                         ++k;
-                         char c1 = p_78259_1_.charAt(k);
- 
--                        if (c1 != 'l' && c1 != 'L')
--                        {
--                            if (c1 == 'r' || c1 == 'R' || func_78272_b(c1))
--                            {
-+                        if (c1 != 'l' && c1 != 'L') {
-+                            if (c1 == 'r' || c1 == 'R' || func_78272_b(c1)) {
-                                 flag = false;
-                             }
--                        }
--                        else
--                        {
-+                        } else {
-                             flag = true;
-                         }
-+                        sectionCount++;
-                     }
--            }
--
--            if (c0 == '\n')
--            {
--                ++k;
--                l = k;
--                break;
-+                }
-             }
- 
-             if (j > p_78259_2_)
-@@ -804,8 +869,19 @@
-                 break;
-             }
-         }
--
--        return k != i && l != -1 && l < k ? l : k;
-+        if(j <= p_78259_2_) {
-+            return p_78259_1_.length();
-+        }
-+        int next = BREAK_ITERATOR.following(k - sectionCount);
-+        int prev = BREAK_ITERATOR.previous();
-+        if (prev == -1) {
-+            if (next == -1) {
-+                return k;
-+            }
-+            return Math.min(k, next);
-+        } else {
-+            return prev;
-+        }
-     }
- 
-     private static boolean func_78272_b(char p_78272_0_)
-@@ -820,7 +896,7 @@
- 
-     public static String func_78282_e(String p_78282_0_)
-     {
--        String s = "";
-+        StringBuilder s = new StringBuilder();
-         int i = -1;
-         int j = p_78282_0_.length();
- 
-@@ -832,21 +908,41 @@
- 
-                 if (func_78272_b(c0))
-                 {
--                    s = "\u00a7" + c0;
-+                    s = new StringBuilder("\u00a7" + c0);
-                 }
-                 else if (func_78270_c(c0))
-                 {
--                    s = s + "\u00a7" + c0;
-+                    s.append("\u00a7").append(c0);
-                 }
-             }
-         }
- 
--        return s;
-+        return s.toString();
-     }
- 
+@@ -847,6 +858,26 @@
      public boolean func_78260_a()
      {
          return this.field_78294_m;

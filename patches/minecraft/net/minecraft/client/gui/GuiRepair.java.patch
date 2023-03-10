@@ -1,13 +1,6 @@
 --- before/net/minecraft/client/gui/GuiRepair.java
 +++ after/net/minecraft/client/gui/GuiRepair.java
-@@ -1,5 +1,6 @@
- package net.minecraft.client.gui;
- 
-+import com.cleanroommc.client.ime.IMEWrapperTextField;
- import io.netty.buffer.Unpooled;
- import java.io.IOException;
- import net.minecraft.client.Minecraft;
-@@ -20,7 +21,7 @@
+@@ -20,7 +20,7 @@
  import net.minecraft.world.World;
  import net.minecraftforge.fml.relauncher.Side;
  import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,11 +9,3 @@
  
  @SideOnly(Side.CLIENT)
  public class GuiRepair extends GuiContainer implements IContainerListener
-@@ -48,6 +49,7 @@
-         this.field_147091_w.func_146204_h(-1);
-         this.field_147091_w.func_146185_a(false);
-         this.field_147091_w.func_146203_f(35);
-+        IMEWrapperTextField.instance.updater = gui -> ((GuiRepair)gui).func_147090_g();
-         this.field_147002_h.func_82847_b(this);
-         this.field_147002_h.func_75132_a(this);
-     }
