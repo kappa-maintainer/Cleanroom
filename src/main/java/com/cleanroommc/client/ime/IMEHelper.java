@@ -8,35 +8,16 @@ import java.awt.event.KeyEvent;
 
 
 public class IMEHelper {
+    public static boolean[] pressingMap = new boolean[256];
 
     public static ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
 
     public static int getFactor() {
         return scaledResolution.getScaleFactor();
     }
-    public static void keepWrapperFocused() {
-        if (IMEWrapperTextField.instance.isVisible()) {
-            IMEWrapperTextField.instance.setVisible(false);
-            IMEWrapperTextField.instance.setVisible(true);
-            return;
-        }
-        if (IMEWrapperBook.instance.isVisible()) {
-            IMEWrapperBook.instance.setVisible(false);
-            IMEWrapperBook.instance.setVisible(true);
-            return;
-        }
-        if (IMEWrapperSign.instance.isVisible()) {
-            IMEWrapperSign.instance.setVisible(false);
-            IMEWrapperSign.instance.setVisible(true);
-        }
-    }
 
-    public static boolean isAnyWrapperVisible() {
-        return IMEWrapperBook.instance.isVisible() || IMEWrapperSign.instance.isVisible() || IMEWrapperTextField.instance.isVisible();
-    }
-
-    /*
-     * Copied from https://www.jpct.net/forum2/index.php?topic=749.0
+    /**
+     * Copied from <a href="https://www.jpct.net/forum2/index.php?topic=749.0">a post on lwjgl forum</a>
      */
     public static int translateFromAWT( int aCode ) {
         return switch (aCode) {
@@ -152,6 +133,8 @@ public class IMEHelper {
             default -> Keyboard.KEY_NONE;
         };
     }
+
+
     public static int translateToAWT( int aCode ) {
         return switch (aCode) {
             case Keyboard.KEY_ESCAPE -> KeyEvent.VK_ESCAPE;
